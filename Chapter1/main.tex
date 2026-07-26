@@ -1,0 +1,519 @@
+\documentclass[11pt]{report}
+
+\usepackage{iftex}
+\ifPDFTeX
+  \errmessage{Please compile with XeLaTeX or LuaLaTeX}
+\fi
+
+\usepackage{fontspec}
+\usepackage{geometry}
+\usepackage{xcolor}
+\usepackage{microtype}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage[most]{tcolorbox}
+\usepackage{amsmath,amssymb,amsthm,mathtools,bm}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{etoolbox}
+\usepackage[nameinlink,noabbrev]{cleveref}
+
+\geometry{
+  paperwidth=7.25in,
+  paperheight=10in,
+  left=0.82in,
+  right=0.82in,
+  top=0.82in,
+  bottom=0.82in,
+  headheight=16pt,
+  headsep=0.33in,
+  footskip=0.42in
+}
+
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{DejaVu Serif}}
+\IfFontExistsTF{Helvetica Neue}{\setsansfont{Helvetica Neue}}{\setsansfont{DejaVu Sans}}
+\IfFontExistsTF{JetBrains Mono}{\setmonofont{JetBrains Mono}}{\setmonofont{DejaVu Sans Mono}}
+
+\linespread{1.18}
+\setlength{\parindent}{1.4em}
+\setlength{\parskip}{0.16em}
+
+% =========================================================
+% Colors
+% =========================================================
+\definecolor{ink}{HTML}{1A1A1A}
+\definecolor{muted}{HTML}{5E5E5E}
+
+\definecolor{defBlueBg}{HTML}{EEF7FF}
+\definecolor{defBlueD}{HTML}{2C7FB8}
+
+\definecolor{exampleGreenBg}{HTML}{EEF8F0}
+\definecolor{exampleGreenD}{HTML}{2E8B57}
+
+\definecolor{theoremPurpleBg}{HTML}{F4EEFF}
+\definecolor{theoremProofBg}{HTML}{FFF9FF}
+\definecolor{theoremPurpleD}{HTML}{7E57C2}
+
+\definecolor{insightBrownBg}{HTML}{F8EFE6}
+\definecolor{insightBrownD}{HTML}{A05A2C}
+
+\definecolor{remarkOrangeBg}{HTML}{FFF4E8}
+\definecolor{remarkOrangeD}{HTML}{C06A21}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=defBlueD,
+  citecolor=defBlueD,
+  urlcolor=defBlueD,
+  pdfauthor={MIStatlE},
+  pdftitle={Information Theory Lecture Template}
+}
+
+% =========================================================
+% Chapter title
+% =========================================================
+\titleformat{\chapter}[hang]
+  {\normalfont\Huge\bfseries\sffamily\color{ink}}
+  {Chapter \thechapter:}{0.55em}{}
+\titlespacing*{\chapter}{0pt}{0.25em}{1.15em}
+
+% =========================================================
+% Header / footer
+% Left header: fixed text for all chapters.
+% Right header: automatically follows the current chapter title.
+% Footer: automatic page number only.
+% =========================================================
+\renewcommand{\chaptermark}[1]{\markboth{Chapter \thechapter: #1}{}}
+
+\fancyhf{}
+\renewcommand{\headrulewidth}{0.35pt}
+\renewcommand{\footrulewidth}{0pt}
+\fancyhead[L]{\small\sffamily\color{ink}Information Theory}
+\fancyhead[R]{\small\sffamily\color{ink}\nouppercase{\leftmark}}
+\fancyfoot[C]{\small\thepage}
+\pagestyle{fancy}
+\fancypagestyle{plain}{%
+  \fancyhf{}%
+  \renewcommand{\headrulewidth}{0.35pt}%
+  \renewcommand{\footrulewidth}{0pt}%
+  \fancyhead[L]{\small\sffamily\color{ink}Information Theory}%
+  \fancyhead[R]{\small\sffamily\color{ink}\nouppercase{\leftmark}}%
+  \fancyfoot[C]{\small\thepage}%
+}
+
+% =========================================================
+% Lists
+% =========================================================
+\setlist[itemize]{leftmargin=1.6em,itemsep=0.34em,topsep=0.35em}
+\setlist[enumerate]{leftmargin=1.8em,itemsep=0.34em,topsep=0.35em}
+
+% =========================================================
+% Shared block styles
+% =========================================================
+\tcbset{
+  lectureblock/.style 2 args={
+    enhanced,
+    breakable,
+    frame hidden,
+    boxrule=0pt,
+    borderline west={3pt}{0pt}{#1},
+    colback=#2,
+    arc=0pt,
+    outer arc=0pt,
+    left=13pt,
+    right=11pt,
+    top=8pt,
+    bottom=8pt,
+    boxsep=0pt,
+    before skip=0.9em,
+    after skip=0.9em
+  },
+  theoremblock/.style n args={3}{
+    enhanced,
+    breakable,
+    bicolor,
+    frame hidden,
+    boxrule=0pt,
+    borderline west={3pt}{0pt}{#1},
+    colback=#2,
+    colbacklower=#3,
+    arc=0pt,
+    outer arc=0pt,
+    left=13pt,
+    right=11pt,
+    top=8pt,
+    bottom=8pt,
+    middle=0pt,
+    boxsep=0pt,
+    segmentation style={draw=none},
+    before skip=0.9em,
+    after skip=0.9em
+  }
+}
+
+% =========================================================
+% Manual blocks
+% =========================================================
+\newtcolorbox{ExampleBox}{
+  lectureblock={exampleGreenD}{exampleGreenBg},
+  before upper={\noindent\textbf{\sffamily\color{exampleGreenD}Example.}\space\ignorespaces}
+}
+
+\newtcolorbox{InsightBox}{
+  lectureblock={insightBrownD}{insightBrownBg},
+  before upper={\noindent\textbf{\sffamily\color{insightBrownD}Insight.}\space\ignorespaces}
+}
+
+\newtcolorbox{RoadmapBox}{
+  lectureblock={defBlueD}{defBlueBg},
+  before upper={\noindent\textbf{\sffamily\color{defBlueD}Roadmap.}\space\ignorespaces}
+}
+
+% =========================================================
+% Theorem block with integrated proof area
+%
+% Usage:
+%   \begin{theorem}[Theorem title]
+%   The theorem statement.
+%   \tcblower
+%   The proof text.
+%   \end{theorem}
+%
+% Upper part: theoremPurpleBg.
+% Lower proof part: theoremProofBg.
+% The left rule is continuous because both parts are in the same tcolorbox.
+% =========================================================
+\newtcolorbox[auto counter]{theorem}[1][]{
+  theoremblock={theoremPurpleD}{theoremPurpleBg}{theoremProofBg},
+  before upper={%
+    \noindent\textbf{\sffamily\color{theoremPurpleD}Theorem~\thetcbcounter%
+    \ifstrempty{#1}{}{ (#1)}.}\space\ignorespaces
+  },
+  before lower={\noindent\textbf{\sffamily\color{theoremPurpleD}Proof.}\space\ignorespaces},
+  after lower={\hfill\qedsymbol}
+}
+
+\newtcolorbox[auto counter]{lemma}[1][]{
+  theoremblock={theoremPurpleD}{theoremPurpleBg}{theoremProofBg},
+  before upper={%
+    \noindent\textbf{\sffamily\color{theoremPurpleD}Lemma~\thetcbcounter%
+    \ifstrempty{#1}{}{ (#1)}.}\space\ignorespaces
+  },
+  before lower={\noindent\textbf{\sffamily\color{theoremPurpleD}Proof.}\space\ignorespaces},
+  after lower={\hfill\qedsymbol}
+}
+
+\newtcolorbox[auto counter]{axiom}[1][]{
+  theoremblock={theoremPurpleD}{theoremPurpleBg}{theoremProofBg},
+  before upper={%
+    \noindent\textbf{\sffamily\color{theoremPurpleD}Axiom~\thetcbcounter%
+    \ifstrempty{#1}{}{ (#1)}.}\space\ignorespaces
+  }
+}
+% =========================================================
+% Definition / remark environments
+% =========================================================
+\newtheoremstyle{lecturedefinition}
+  {0.3em}{0.3em}{}{}%
+  {\bfseries\sffamily\color{defBlueD}}{.}{0.45em}{}
+
+\newtheoremstyle{lectureremark}
+  {0.3em}{0.3em}{}{}%
+  {\bfseries\sffamily\color{remarkOrangeD}}{.}{0.45em}{}
+
+\theoremstyle{lecturedefinition}
+\newtheorem{definition}{Definition}
+
+\theoremstyle{lectureremark}
+\newtheorem{remark}{Remark}
+
+\tcolorboxenvironment{definition}{lectureblock={defBlueD}{defBlueBg}}
+\tcolorboxenvironment{remark}{lectureblock={remarkOrangeD}{remarkOrangeBg}}
+
+% Math helpers
+\DeclareMathOperator{\Var}{Var}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\norm}[1]{\left\lVert #1 \right\rVert}
+
+\begin{document}
+
+\chapter{Introduction}
+\begin{center}
+by ZYL
+\end{center}
+\section{What Is Information}
+In information theory, \textbf{information} is closely related to \textbf{uncertainty}. The more uncertain an event is before it occurs, the more information we gain after observing its outcome. Conversely, if an event is almost certain to happen, then observing it provides little new information.
+
+\begin{definition}[Information]
+\textbf{Information} is the amount of uncertainty reduced after observing the outcome of a random experiment.
+\end{definition}
+
+Consider a simple random experiment: tossing a coin. If the coin is fair, then
+\begin{equation}
+P(\text{heads})=P(\text{tails})=\frac{1}{2}.
+\end{equation}
+In this case, both outcomes are equally likely, so the uncertainty is high. If the coin is biased, then
+\begin{equation}
+    P(\text{heads})\ne P(\text{tails}).
+\end{equation}
+For example, $P(\text{heads})=0.99$, $P(\text{tails})=0.01$. In this case, the result is much easier to predict, so the uncertainty is lower. Therefore, the basic intuition is: $\text{More uncertainty}\Rightarrow \text{More possible information gain}$. Information can therefore be understood as the reduction or resolution of uncertainty.
+
+\section{Discrete Random Variables}
+To measure uncertainty rigorously, we first describe random outcomes using random variables.
+
+\begin{definition}[Random Variables]
+A \textbf{discrete random variable} $X$ is a variable whose possible values belong to a finite or countable set $\mathcal{X}$. The event $\{X=x\}$ means that the random variable $X$ takes the particular value $x$, where $x\in \mathcal{X}$.
+\end{definition}
+
+For the coin-tossing experiment, we may define $\mathcal{X}=\{0,1\}$. Let $X=0$ represents heads, and $X=1$ represents tails. Then the random variable $X$ describes the outcome of the coin toss.
+
+\begin{definition}[Probability Mass Function]
+Let $X$ be a discrete random variable taking values in $\mathcal{X}$. Its probability mass function (PMF) is defined as:
+\[
+p(x)=P(X=x),\quad x\in \mathcal{X}
+\]
+The PMF satisfies:
+\begin{itemize}
+    \item $p(x)\ge 0, \quad \forall x\in \mathcal{X}$
+    \item $\sum_{x\in X}p(x)=1$
+\end{itemize}
+\end{definition}
+The PMF completely determines the probability distribution of a discrete random variable.
+
+\section{Entropy}
+Since information is related to uncertainty, we need a mathematical function to measure the uncertainty of a random variable. This function is called \textbf{entropy}.
+
+\begin{definition}[Entropy]
+Let $X$ be a discrete random variable with PMF $p(x)$. The entropy of $X$, denoted by $H(X)$, is a measure of the uncertainty of $X$.
+\end{definition}
+
+Since the uncertainty of $X$ depends only on its probability distribution, entropy is a function of the probabilities:
+\begin{equation}
+    H(X) = H\left(\{p(x):x\in\mathcal{X}\}\right).
+\end{equation}
+If $X$ has $n$ possible outcomes with probabilities $p_1, p_2,\cdots, p_n$, then we can write
+\begin{equation}
+    H(X)=H(p_1, p_2,\cdots, p_n).
+\end{equation}
+A more uniform probability distribution has greater uncertainty.
+
+\begin{ExampleBox}
+\[
+H(\frac{1}{3},\frac{1}{3},\frac{1}{3})>H(\frac{1}{2},\frac{1}{2}).
+\]
+The first distribution has three equally likely outcomes, while the second has only two equally likely outcomes. Since there are more possibilities in the first case, the uncertainty is larger.
+\end{ExampleBox}
+
+For a uniform distribution over $n$ outcomes $\left(\frac{1}{n},\frac{1}{n},\cdots\frac{1}{n}\right)$, the uncertainty should increase as $n$ increases.
+
+\section{Axioms of Entropy}
+Entropy should not be defined arbitrarily. A reasonable measure of uncertainty should satisfy several natural requirements. These requirements are called the \textbf{axioms of entropy}.
+
+\begin{axiom}[Normalization]
+For two equally likely outcomes, $H\left(\frac{1}{2},\frac{1}{2}\right)=1$. The unit is \textbf{bit}.
+\end{axiom}
+
+The axiom defines the unit of information: A fair binary random experiment contains exactly one bit of uncertainty.
+
+\begin{axiom}[Monotonicity]
+Define $h(n)=H\left(\frac{1}{n},\frac{1}{n},\cdots,\frac{1}{n}\right)$. Then $h(n)$ is a monotonic non-decreasing function.
+\end{axiom}
+
+This means that an experiment with more equally likely outcomes should not have less uncertainty.
+
+
+\begin{axiom}[Continuity]
+Entropy $H(X)$ should be a continuous function of the probabilities.
+\end{axiom}
+This means that if the probability distribution changes only slightly, then the entropy should also change only slightly, which rules out unreasonable uncertainty measures that change abruptly when the probabilities change only a little.
+
+
+\begin{axiom}[Grouping Property]
+\[
+H\left(p_1, p_2, p_3,\cdots, p_n\right)=H\left(p_1+p_2,p_3,\cdots,p_n\right)+(p_1+p_2)H\left(\frac{p_1}{p_1+p_2},\frac{p_2}{p_1+p_2}\right).
+\]
+
+\end{axiom}
+The first term $H\left(p_1+p_2,p_3,\cdots,p_n\right)$ measures the uncertainty of deciding which group the outcome belongs to. The second term $(p_1+p_2)H\left(\frac{p_1}{p_1+p_2},\frac{p_2}{p_1+p_2}\right)$ measures the conditional uncertainty of distinguishing the two outcomes inside the first group. The coefficient $p_1+p_2$ appears because this internal distinction is only needed when the outcome actually falls into that group.
+
+The grouping property can be expressed in a general form. Suppose we have a discrete distribution: $P=(p_1, p_2, \cdots,p_n)$. Partition the index set into $m$ disjoint groups: $G_a, G_2,\cdots, G_m$. For each group $G_k$, define its total probability as $P_k=\sum_{i\in G_k}p_i$. Inside group $G_k$, define the conditional probability $q_{i|k}=\frac{p_i}{P_k}$, where $i\in G_k$, then the entropy satisfies:
+\begin{equation}
+    H(p_1, p_2,\cdots, p_n)=H(P_1, P_2,\cdots, P_m)+\sum_{k=1}^m P_k H\left(\left\{ q_{i|k}:i\in G_k \right\}\right)
+\end{equation}
+This formula says that total uncertainty can be decomposed into two levels:
+\begin{equation*}
+    \text{total uncertainty} = \text{uncertainty among groups} + \text{average uncertainty within groups}
+\end{equation*}
+
+This property is fundamental because it reflects the idea of a multi-stage decision process. First, we determine which group the outcome belongs to. Then, after the group is known, we determine the exact outcome inside that group.
+
+\section{Entropy of Uniform Distribution}
+Now consider a uniform distribution over $n$ outcomes. Define
+\begin{equation}
+    h(n)=H\left(\frac{1}{n},\frac{1}{n},\cdots, \frac{1}{n}\right)
+\end{equation}
+
+\begin{lemma}
+For positive integers $n$ and $m$,
+\vspace{-0.8em}
+\[
+h(nm)=h(n) + h(m)
+\]
+\vspace{-1.2em}
+\tcblower
+
+Consider a uniform distribution over $nm$ outcomes:
+\[
+\left(\frac{1}{nm},\frac{1}{nm},\cdots,\frac{1}{nm}\right)
+\]
+Divide these $nm$ outcomes into $n$ groups, each containing $m$ outcomes. Then, each group has probability $m\cdot \frac{1}{nm}=\frac{1}{n}$. Therefore, the uncertainty of selecting one group among $n$ equally likely groups is $h(n)$. Once a group is selected, there are $m$ equally likely outcomes inside the group, so the internal uncertainty is $h(m)$.
+
+By grouping property,
+\begin{equation*}
+\begin{aligned}
+h(nm)=&h(n)+\sum_{i=1}^n \frac{1}{n}h(m) \\
+=&h(n)+n\cdot \frac{1}{n}h(m)\\
+=& h(n)+h(m)
+\end{aligned}
+\end{equation*}
+\end{lemma}
+
+This lemma shows that choosing one outcome from $nm$ equally likely outcomes can be viewed as a two-stage process: First, choose one of $n$ groups. Then, choose one of $m$ outcomes inside selected group. Therefore, the total uncertainty is the sum of the two uncertainties.
+
+\begin{lemma}
+For every positive integer $n$,
+\[
+h(n)=\log_2 n
+\]
+\vspace{-0.8em}
+\vspace{-1.2em}
+\tcblower
+
+Choose an arbitrary large number $N\in\mathbb{Z}^+$. For any positive integer $n$, there exist an integer $k$ s.t.
+\[
+2^k\le n^N\le 2^{k+1}\tag{*}
+\]
+By monotonicity,
+\[
+h(2^k)\le h(n^N)\le h(2^{k+1}).
+\]
+Using Lemma 1 repeatedly,
+\begin{equation*}
+\begin{aligned}
+h(2^k)&=k\cdot h(2)=k\cdot 1 = k\\
+h(2^{k+1})&=(k+1)\cdot h(2)=(k+1)\cdot 1=k+1 \\
+h(n^N)&=N\cdot h(n)
+\end{aligned}
+\end{equation*}
+Therefore,
+\[
+k\le Nh(n)\le k+1
+\]
+Dividing by $N$, we get
+\[
+\frac{k}{N}\le h(n)\le \frac{k}{N}+\frac{1}{N}
+\]
+that is:
+\[
+\forall \varepsilon>0,\left|h(n)-\frac{k}{N}\right|\le \varepsilon\tag{1}
+\]
+Take logarithm with base 2 on both sides of equation (*), we get
+\[
+k\le N\log_2 n\le k+1
+\]
+Dividing by $N$:
+\[
+\frac{k}{N}\le log_2 n\le \frac{k}{N}+\frac{1}{N}
+\]
+that is:
+\[
+\forall \varepsilon>0,\left|\log_2 n-\frac{k}{N}\right|\le \varepsilon\tag{2}
+\]
+Hence, from equation (1) and (2), we get
+\begin{equation*}
+\begin{aligned}
+\left|h(n)-\log_2 n\right|&=\left|h(n)-\frac{k}{N}+\frac{k}{N}-\log_2 n\right|\\
+&\le\left|h(n)-\frac{k}{N}\right|+\left|\frac{k}{N}-\log_2 n\right|\\
+&\le \varepsilon+\varepsilon\\
+&=2\varepsilon
+\end{aligned}
+\end{equation*}
+Since $\varepsilon$ is arbitrarily small, $h(n)=\log_2 n$.
+\end{lemma}
+
+Thus, the entropy of a uniform distribution grows logarithmically with the number of possible outcomes. For example, $h(2)=1$, $h(4)=2$, $h(8)=3$. This means that choosing one outcome from eight equally likely possibilities requires 3 bits of information.
+
+\section{Shannon Entropy}
+We now derive the entropy formula for a general discrete distribution.
+
+Suppose $X$ takes values $x_1, x_2, \cdots, x_k$ with probabilities $p(x_1), p(x_2),\cdots, p(x_k)$. First, assume that all probabilities are rational. Then, there exist positive integers $N,n_1, n_2,\cdots, n_k$ such that 
+\begin{equation}
+p(x_i)=\frac{n_i}{N}
+\end{equation}
+where $\sum_{i=1}^k n_i=N$.
+Now construct a uniform experiment with $N$ equally likely elementary outcomes. Each elementary outcome has probability $\frac{1}{N}$. Group these $N$ elementary outcomes into $k$ groups. The $i$-th group contains $n_i$ outcomes. Therefore, the probability of group $i$ is
+\begin{equation}
+\frac{n_i}{N}=p(x_i)
+\end{equation}
+The entropy of the original uniform experiment is $\log_2 N$. By the grouping property,
+\begin{equation}
+    \log_2 N=H(p(x_1, p(x_2),\cdots, p(x_k)))+\sum_{i=1}^k p(x_i)\log_2 n_i
+\end{equation}
+Therefore,
+\begin{equation}
+    H(X)=\log_2 N-\sum_{i=1}^k p(x_i)\log_2 n_i
+\end{equation}
+Since $p(x_i)=\frac{n_i}{N}$, we have $n_i=Np(x_i)$. Thus,
+\begin{equation}
+    \log_2 n_i=\log_2 N + \log_2 p(x_i)
+\end{equation}
+Substituting this into the previous equation gives
+\begin{equation}
+    H(X)=\log_2 N-\sum_{i=1}^k p(x_i)\left(\log_2N+\log_2 p(x_i)\right)
+\end{equation}
+Expanding,
+\begin{equation}
+    H(X)=\log_2 N-\sum_{i=1}^k p(x_i)\log_2 N-\sum_{i=1}^k p(x_i)\log_2 p(x_i)
+\end{equation}
+Since $\sum_{i=1}^k p(x_i)=1$, we have
+\begin{equation}
+    \sum_{i=1}^k p(x_i)\log_2^N=\log_2 N
+\end{equation}
+Therefore,
+\begin{equation}
+    H(X)=-\sum_{i=1}^k p(x_i)\log_2 p(x_i)
+\end{equation}
+
+For irrational probabilities, the same result follows from the continuity axiom, because irrational probability distributions can be approximated arbitrarily well by rational probability distributions.
+
+\begin{definition}[Shannon Entropy]
+In general, for a discrete random variable $X$ with PMF $p(x)$,
+\[
+H(X)=-\sum_{x\in\mathcal{X}}p(x)\log(x)
+\] 
+For a continuous random variable $X$ with PDF $p(x)$,
+\[
+h(X)=-\int f(x)\log f(x) dx
+\]
+\end{definition}
+
+\begin{InsightBox}
+A discrete entropy is always nonnegative, while differential entropy can be negative. Therefore, differential entropy should be interpreted carefully.
+\end{InsightBox}
+
+The unit of entropy depends on the logarithm base. If the logarithm is base 2, then entropy is measured in \textbf{bits}:
+\begin{equation}
+\begin{aligned}
+    H(X)&=-\sum_{x\in\mathcal{X}}p(x)\log_2(x)\\
+    h(X)&=-\int f(x)\log_2 f(x) dx
+\end{aligned}
+\end{equation}
+If the logarithm is the natural logarithm, then entropy is measured in \textbf{nats}:
+\begin{equation}
+\begin{aligned}
+    H(X)&=-\sum_{x\in\mathcal{X}}p(x)\ln(x)\\
+    h(X)&=-\int f(x)\ln f(x) dx
+\end{aligned}
+\end{equation}
+\end{document}
