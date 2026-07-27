@@ -761,4 +761,42 @@ We can draw a Venn diagram to show the relationship among entropy $H(X), H(Y)$, 
     \includegraphics[width=0.5\linewidth]{figure.pdf}
 \label{fig:relationship_between_entropy_and_mutual_information}
 \end{figure}
+
+\noindent\textbf{\textit{Exercise}}
+\vspace{3pt}
+\hrule
+\vspace{6pt}
+\noindent 1. (\textit{Information cannot increase under deterministic processing.}) Let $X$ and \(Y\) be discrete random variables, and let $Z=g(Y)$ for some deterministic function $g$. Prove that
+\begin{equation*}
+    I(X;Z)\le I(X;Y).
+\end{equation*}
+
+\noindent 2. Let $X$, $Y$, $Z$ be discrete random variables. Prove that
+\begin{equation*}
+    H(X,Y)+H(Y,Z)\ge H(Y)+H(X,Y,Z)
+\end{equation*}
+
+\noindent 3. Let $X_1,\dots, X_n$ be discrete random variables. Using the general chain rule, prove that
+\begin{equation*}
+H(X_1,\cdots, X_n)\le \sum_{i=1}^n H(X_i)
+\end{equation*}
+and that equality holds if and only if $X_1,\dots, X_n$ are mutually independent.
+
+\noindent 4. (\textit{Han's Inequality}) Let $X_1, \dots, X_n$ be discrete random variables, and let
+$X_{-i}=(X_1,\dots,\allowbreak X_{i-1},X_{i+1},\dots,X_n)$ denote the collection obtained by removing $X_i$. Prove that
+\begin{equation*}
+    (n-1)H(X_1,\dots, X_n)\le \sum_{i=1}^n H(X_{-i})
+\end{equation*}
+
+\noindent 5. (\textit{Concavity of entropy}) Let $p$ and $q$ be two PMFs on the same finite alphabet $\mathcal{X}$, and let $r(x)=\lambda p(x)+(1-\lambda)q(x),0<\lambda<1$.
+Show that
+\begin{equation*}
+    H(r)\ge \lambda H(p)+(1-\lambda)H(q)
+\end{equation*}
+and that equality holds if and only if $p(x)=q(x)$ for every $x\in\mathcal{X}$.
+
+\noindent 6. Let $T=g(Y)$ be a deterministic function of $Y$. Assume that for every $y$ with $p_Y(y)>0$, $p_{X\mid Y}(x\mid y)=p_{X\mid T}(x\mid g(y))$ for all $x$. Prove that
+\begin{equation}
+    I(X;T)=I(X;Y).
+\end{equation}
 \end{document}
